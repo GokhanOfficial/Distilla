@@ -1,0 +1,19 @@
+# Rust
+target/
+
+# Frontend
+web/node_modules/
+web/dist/
+assets/pdf/
+
+# Environment & Secrets
+.env
+.env.local
+.env.*.local
+.google-token.json
+
+# OS & Logs
+.DS_Store
+Thumbs.db
+*.log
+tmp/

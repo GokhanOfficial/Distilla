@@ -1,0 +1,302 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg-page: #0b1120;
+  --bg-surface: rgba(15, 23, 42, 0.85);
+  --bg-card: rgba(30, 41, 59, 0.6);
+  --bg-elevated: #1e293b;
+  --bg-input: #0f172a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-subtle: rgba(71, 85, 105, 0.45);
+  --border-strong: #475569;
+  --accent: #6366f1;
+  --accent-hover: #4f46e5;
+  --accent-soft: rgba(99, 102, 241, 0.14);
+  --code-bg: #111827;
+  --code-inline-bg: #1e293b;
+  --code-inline-text: #f472b6;
+}
+
+html.light {
+  --bg-page: #f8fafc;
+  --bg-surface: rgba(255, 255, 255, 0.92);
+  --bg-card: #ffffff;
+  --bg-elevated: #f1f5f9;
+  --bg-input: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-muted: #64748b;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --accent: #4f46e5;
+  --accent-hover: #4338ca;
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --code-bg: #f8fafc;
+  --code-inline-bg: #f1f5f9;
+  --code-inline-text: #be185d;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg-page);
+    color: var(--text-primary);
+    font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    min-height: 100vh;
+    margin: 0;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+.surface-header {
+  background-color: var(--bg-surface);
+  border-bottom: 1px solid var(--border-subtle);
+  backdrop-filter: blur(12px);
+}
+
+.surface-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 1rem;
+}
+
+.surface-elevated {
+  background-color: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+}
+
+.surface-input {
+  background-color: var(--bg-input);
+  border: 1px solid var(--border-strong);
+  color: var(--text-primary);
+}
+
+.surface-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
+.text-main {
+  color: var(--text-primary);
+}
+
+.text-sub {
+  color: var(--text-secondary);
+}
+
+.text-dim {
+  color: var(--text-muted);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 8px 20px -6px rgba(99, 102, 241, 0.45);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-secondary {
+  background-color: var(--bg-elevated);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  font-weight: 500;
+  border-radius: 0.65rem;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.btn-secondary:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.btn-secondary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Markdown preview styling aligned with PDF output */
+.doc-preview {
+  line-height: 1.7;
+  color: var(--text-primary);
+}
+
+.doc-preview h1 {
+  font-size: 1.85rem;
+  font-weight: 700;
+  border-bottom: 2px solid var(--border-subtle);
+  padding-bottom: 0.4rem;
+  margin: 0 0 1rem 0;
+  color: var(--text-primary);
+}
+
+.doc-preview h2 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin: 1.4rem 0 0.65rem 0;
+  color: var(--text-primary);
+}
+
+.doc-preview h3 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 1.1rem 0 0.45rem 0;
+  color: var(--text-primary);
+}
+
+.doc-preview p {
+  margin: 0 0 0.85rem 0;
+}
+
+.doc-preview pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.65rem;
+  padding: 0.9rem 1rem;
+  margin: 0.9rem 0;
+  overflow-x: auto;
+}
+
+.doc-preview code {
+  font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+  font-size: 0.88em;
+}
+
+.doc-preview :not(pre) > code {
+  background: var(--code-inline-bg);
+  color: var(--code-inline-text);
+  padding: 0.12rem 0.4rem;
+  border-radius: 0.3rem;
+}
+
+.doc-preview table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 1rem 0;
+  font-size: 0.92rem;
+}
+
+.doc-preview th,
+.doc-preview td {
+  border: 1px solid var(--border-subtle);
+  padding: 0.55rem 0.75rem;
+  text-align: left;
+}
+
+.doc-preview th {
+  background: var(--bg-elevated);
+  font-weight: 600;
+}
+
+.doc-preview blockquote {
+  border-left: 4px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 0.65rem 1rem;
+  margin: 0.9rem 0;
+  border-radius: 0 0.5rem 0.5rem 0;
+  color: var(--text-secondary);
+}
+
+.doc-preview ul,
+.doc-preview ol {
+  padding-left: 1.5rem;
+  margin: 0.4rem 0 0.9rem 0;
+}
+
+.doc-preview ul {
+  list-style-type: disc;
+}
+
+.doc-preview ol {
+  list-style-type: decimal;
+}
+
+.doc-preview li {
+  margin: 0.25rem 0;
+}
+
+.doc-preview hr {
+  border: none;
+  border-top: 1px solid var(--border-subtle);
+  margin: 1.5rem 0;
+}
+
+.doc-preview a {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* Highlight.js adaptive tokens */
+.doc-preview .hljs {
+  background: transparent;
+  color: var(--text-primary);
+}
+.doc-preview .hljs-keyword,
+.doc-preview .hljs-selector-tag {
+  color: #f472b6;
+}
+.doc-preview .hljs-title,
+.doc-preview .hljs-function {
+  color: #c084fc;
+}
+.doc-preview .hljs-string,
+.doc-preview .hljs-regexp {
+  color: #34d399;
+}
+.doc-preview .hljs-number,
+.doc-preview .hljs-literal,
+.doc-preview .hljs-attr {
+  color: #60a5fa;
+}
+.doc-preview .hljs-comment {
+  color: #64748b;
+  font-style: italic;
+}
+
+html.light .doc-preview .hljs-keyword,
+html.light .doc-preview .hljs-selector-tag {
+  color: #cf222e;
+}
+html.light .doc-preview .hljs-title,
+html.light .doc-preview .hljs-function {
+  color: #8250df;
+}
+html.light .doc-preview .hljs-string,
+html.light .doc-preview .hljs-regexp {
+  color: #0a3069;
+}
+html.light .doc-preview .hljs-number,
+html.light .doc-preview .hljs-literal,
+html.light .doc-preview .hljs-attr {
+  color: #0550ae;
+}
+html.light .doc-preview .hljs-comment {
+  color: #6e7781;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 9999px;
+}

@@ -1,0 +1,12 @@
+target
+web/node_modules
+web/dist
+assets/pdf
+.env
+.env.*
+!.env.example
+.git
+.gitignore
+.google-token.json
+*.log
+tmp

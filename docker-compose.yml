@@ -1,0 +1,20 @@
+services:
+  distilla:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: distilla:latest
+    container_name: distilla
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PORT: ${PORT:-3000}
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://127.0.0.1:${PORT:-3000}/api/health > /dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
