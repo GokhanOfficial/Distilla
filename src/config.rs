@@ -209,25 +209,40 @@ fn clean_env_value(raw: &str) -> String {
     raw.to_string()
 }
 
+fn format_model_label(id: &str) -> String {
+    let label = id
+        .split(['-', '_', '/', ' '])
+        .filter(|part| !part.is_empty())
+        .map(|part| {
+            let mut chars = part.chars();
+            match chars.next() {
+                Some(first) => {
+                    let mut word = first.to_uppercase().to_string();
+                    word.push_str(&chars.as_str().to_lowercase());
+                    word
+                }
+                None => String::new(),
+            }
+        })
+        .collect::<Vec<_>>()
+        .join(" ");
+
+    if label.is_empty() {
+        id.to_string()
+    } else {
+        label
+    }
+}
+
 fn parse_models(raw: Option<&str>) -> Vec<ModelOption> {
-    let defaults = vec![
-        ModelOption {
-            id: "gemini-2.5-flash".to_string(),
-            label: "Gemini 2.5 Flash".to_string(),
-        },
-        ModelOption {
-            id: "gemini-2.5-flash-lite".to_string(),
-            label: "Gemini 2.5 Flash Lite".to_string(),
-        },
-        ModelOption {
-            id: "gpt-4o".to_string(),
-            label: "GPT-4o".to_string(),
-        },
-        ModelOption {
-            id: "gpt-4o-mini".to_string(),
-            label: "GPT-4o Mini".to_string(),
-        },
-    ];
+    let default_ids = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gpt-4o", "gpt-4o-mini"];
+    let defaults: Vec<ModelOption> = default_ids
+        .iter()
+        .map(|id| ModelOption {
+            id: (*id).to_string(),
+            label: format_model_label(id),
+        })
+        .collect();
 
     let Some(s) = raw else {
         return defaults;
@@ -241,14 +256,23 @@ fn parse_models(raw: Option<&str>) -> Vec<ModelOption> {
                 return None;
             }
             if let Some((id, label)) = trimmed.split_once(':') {
+                let id = id.trim();
+                let label = label.trim();
+                if id.is_empty() {
+                    return None;
+                }
                 Some(ModelOption {
-                    id: id.trim().to_string(),
-                    label: label.trim().to_string(),
+                    id: id.to_string(),
+                    label: if label.is_empty() {
+                        format_model_label(id)
+                    } else {
+                        label.to_string()
+                    },
                 })
             } else {
                 Some(ModelOption {
                     id: trimmed.to_string(),
-                    label: trimmed.to_string(),
+                    label: format_model_label(trimmed),
                 })
             }
         })
@@ -339,12 +363,18 @@ mod tests {
     }
 
     #[test]
-    fn parses_model_list() {
-        let models = parse_models(Some("gpt-4o:GPT-4o, gemini-2.5-flash"));
-        assert_eq!(models.len(), 2);
-        assert_eq!(models[0].id, "gpt-4o");
-        assert_eq!(models[0].label, "GPT-4o");
-        assert_eq!(models[1].id, "gemini-2.5-flash");
-        assert_eq!(models[1].label, "gemini-2.5-flash");
+    fn parses_model_list_and_generates_labels() {
+        assert_eq!(format_model_label("gemini-2.5-flash"), "Gemini 2.5 Flash");
+        assert_eq!(format_model_label("gemini-4-hydrogen"), "Gemini 4 Hydrogen");
+        assert_eq!(format_model_label("gpt-4o"), "Gpt 4o");
+        assert_eq!(format_model_label("gpt-6.2-sol"), "Gpt 6.2 Sol");
+
+        let models = parse_models(Some("gemini-2.5-flash, gemini-4-hydrogen, gpt-4o, gpt-6.2-sol"));
+        assert_eq!(models.len(), 4);
+        assert_eq!(models[0].id, "gemini-2.5-flash");
+        assert_eq!(models[0].label, "Gemini 2.5 Flash");
+        assert_eq!(models[1].label, "Gemini 4 Hydrogen");
+        assert_eq!(models[2].label, "Gpt 4o");
+        assert_eq!(models[3].label, "Gpt 6.2 Sol");
     }
 }
