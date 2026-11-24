@@ -23,18 +23,11 @@
   <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5">
     <div class="flex items-center gap-6">
       <a href="/" onclick={(e) => go('/', e)} class="flex items-center gap-3">
-        <div
-          class="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 shadow-lg shadow-indigo-500/25"
-        >
-          <svg class="h-6 w-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 3c-2.8 4.2-6 7.4-6 11a6 6 0 0012 0c0-3.6-3.2-6.8-6-11z"
-            />
-          </svg>
-        </div>
+        <img
+          src="/favicon.svg"
+          alt={appName}
+          class="h-10 w-10 rounded-xl shadow-lg shadow-indigo-500/25"
+        />
         <div class="hidden sm:block">
           <h1 class="bg-gradient-to-r from-indigo-400 to-purple-400 bg-clip-text text-xl font-bold text-transparent">
             {appName}
