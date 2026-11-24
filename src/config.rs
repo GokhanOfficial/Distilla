@@ -18,8 +18,10 @@ pub struct ModelOption {
 pub struct OpenAiConfig {
     pub api_key: String,
     pub base_url: String,
-    pub models: Vec<ModelOption>,
-    pub default_model: String,
+    pub convert_models: Vec<ModelOption>,
+    pub default_convert_model: Option<String>,
+    pub summarize_models: Vec<ModelOption>,
+    pub default_summarize_model: Option<String>,
     pub filename_model: Option<String>,
     pub pdf_input_mode: PdfInputMode,
 }
@@ -99,11 +101,17 @@ impl AppConfig {
             .trim_end_matches('/')
             .to_string();
 
-        let models = parse_models(env_string("AI_MODELS").as_deref());
-        let default_model = env_string("AI_DEFAULT_MODEL")
-            .unwrap_or_else(|| models[0].id.clone());
-        let filename_model = env_string("AI_FILENAME_MODEL")
-            .or_else(|| env_string("OPENAI_FILENAME_MODEL"));
+        let convert_models = parse_models(env_string("CONVERT_MODELS").as_deref());
+        let default_convert_model = env_string("CONVERT_DEFAULT_MODEL")
+            .or_else(|| convert_models.first().map(|m| m.id.clone()));
+
+        let summarize_models = parse_models(env_string("SUMMARIZE_MODELS").as_deref());
+        let default_summarize_model = env_string("SUMMARIZE_DEFAULT_MODEL")
+            .or_else(|| summarize_models.first().map(|m| m.id.clone()));
+
+        let filename_model = env_string("FILENAME_MODEL")
+            .or_else(|| env_string("OPENAI_FILENAME_MODEL"))
+            .or_else(|| env_string("AI_FILENAME_MODEL"));
 
         let pdf_input_mode = match env_string("PDF_INPUT_MODE")
             .unwrap_or_else(|| "image_url".to_string())
@@ -152,8 +160,10 @@ impl AppConfig {
             openai: OpenAiConfig {
                 api_key,
                 base_url,
-                models,
-                default_model,
+                convert_models,
+                default_convert_model,
+                summarize_models,
+                default_summarize_model,
                 filename_model,
                 pdf_input_mode,
             },
@@ -235,54 +245,22 @@ fn format_model_label(id: &str) -> String {
 }
 
 fn parse_models(raw: Option<&str>) -> Vec<ModelOption> {
-    let default_ids = ["gemini-2.5-flash", "gemini-2.5-flash-lite", "gpt-4o", "gpt-4o-mini"];
-    let defaults: Vec<ModelOption> = default_ids
-        .iter()
-        .map(|id| ModelOption {
-            id: (*id).to_string(),
-            label: format_model_label(id),
-        })
-        .collect();
-
     let Some(s) = raw else {
-        return defaults;
+        return Vec::new();
     };
 
-    let parsed: Vec<ModelOption> = s
-        .split(',')
+    s.split(',')
         .filter_map(|item| {
             let trimmed = item.trim();
             if trimmed.is_empty() {
                 return None;
             }
-            if let Some((id, label)) = trimmed.split_once(':') {
-                let id = id.trim();
-                let label = label.trim();
-                if id.is_empty() {
-                    return None;
-                }
-                Some(ModelOption {
-                    id: id.to_string(),
-                    label: if label.is_empty() {
-                        format_model_label(id)
-                    } else {
-                        label.to_string()
-                    },
-                })
-            } else {
-                Some(ModelOption {
-                    id: trimmed.to_string(),
-                    label: format_model_label(trimmed),
-                })
-            }
+            Some(ModelOption {
+                id: trimmed.to_string(),
+                label: format_model_label(trimmed),
+            })
         })
-        .collect();
-
-    if parsed.is_empty() {
-        defaults
-    } else {
-        parsed
-    }
+        .collect()
 }
 
 fn detect_chromium_binary() -> Option<String> {
@@ -375,6 +353,7 @@ mod tests {
         assert_eq!(models[0].label, "Gemini 2.5 Flash");
         assert_eq!(models[1].label, "Gemini 4 Hydrogen");
         assert_eq!(models[2].label, "Gpt 4o");
-        assert_eq!(models[3].label, "Gpt 6.2 Sol");
+        assert!(parse_models(None).is_empty());
+        assert!(parse_models(Some("  ,  ")).is_empty());
     }
 }

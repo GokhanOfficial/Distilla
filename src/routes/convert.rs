@@ -49,7 +49,7 @@ pub async fn start_job(State(state): State<AppState>, mut multipart: Multipart) 
     }
 
     let mut guard = Some(TempDirGuard::new(job_dir.clone()));
-    let mut selected_model = state.config.openai.default_model.clone();
+    let mut selected_model: Option<String> = state.config.openai.default_convert_model.clone();
     let mut saved_file: Option<(PathBuf, String, &'static FormatSpec)> = None;
     let max_bytes = state.config.max_upload_bytes();
 
@@ -60,7 +60,7 @@ pub async fn start_job(State(state): State<AppState>, mut multipart: Multipart) 
             if let Ok(val) = field.text().await {
                 let trimmed = val.trim();
                 if !trimmed.is_empty() {
-                    selected_model = trimmed.to_string();
+                    selected_model = Some(trimmed.to_string());
                 }
             }
             continue;
@@ -157,6 +157,14 @@ pub async fn start_job(State(state): State<AppState>, mut multipart: Multipart) 
             StatusCode::BAD_REQUEST,
             "No file uploaded",
             "errors.noFile",
+        );
+    };
+
+    let Some(selected_model) = selected_model.filter(|m| !m.trim().is_empty()) else {
+        return json_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "No converter AI model configured (set CONVERT_MODELS in .env)",
+            "errors.noModelConfigured",
         );
     };
 

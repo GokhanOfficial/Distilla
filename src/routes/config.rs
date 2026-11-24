@@ -23,8 +23,10 @@ pub async fn health(State(state): State<AppState>) -> Json<Value> {
 pub async fn public_config(State(state): State<AppState>) -> Json<Value> {
     Json(json!({
         "appName": state.config.app_name,
-        "models": state.config.openai.models,
-        "defaultModel": state.config.openai.default_model,
+        "convertModels": state.config.openai.convert_models,
+        "defaultConvertModel": state.config.openai.default_convert_model,
+        "summarizeModels": state.config.openai.summarize_models,
+        "defaultSummarizeModel": state.config.openai.default_summarize_model,
         "maxUploadSizeMb": state.config.max_upload_size_mb,
         "mediaMaxOutputSizeMb": state.config.media.max_output_size_mb,
         "supportedExtensions": formats::all_extensions(),

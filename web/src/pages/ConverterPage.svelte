@@ -56,8 +56,8 @@
   let exportingPdf = $state(false);
 
   $effect(() => {
-    if (!selectedModel && config.defaultModel) {
-      selectedModel = config.defaultModel;
+    if (!selectedModel && config.defaultConvertModel) {
+      selectedModel = config.defaultConvertModel;
     }
   });
 
@@ -140,6 +140,12 @@
       return;
     }
 
+    const modelToUse = selectedModel || config.defaultConvertModel;
+    if (!modelToUse) {
+      toasts.show(i18n.t('toast.noModelConfigured'), 'error');
+      return;
+    }
+
     cleanupActive();
     busy = true;
     cancelling = false;
@@ -154,7 +160,7 @@
     cachedTitleHash = '';
 
     try {
-      const upload = startConversionUpload(selectedFile, selectedModel || config.defaultModel, (p) => {
+      const upload = startConversionUpload(selectedFile, modelToUse, (p) => {
         uploadProgress = p;
       });
       activeUploadAbort = upload.abort;
@@ -247,7 +253,7 @@
     if (cachedTitle && cachedTitleHash === hash) return cachedTitle;
     toasts.show(i18n.t('toast.generatingTitle'), 'info', 2000);
     try {
-      const title = await generateTitle(markdown, selectedModel || config.defaultModel);
+      const title = await generateTitle(markdown, selectedModel || config.defaultConvertModel || undefined);
       cachedTitle = title;
       cachedTitleHash = hash;
       return title;
@@ -403,12 +409,16 @@
             <select
               id="conv-model"
               bind:value={selectedModel}
-              disabled={busy}
+              disabled={busy || config.convertModels.length === 0}
               class="surface-input w-full rounded-lg px-3 py-2 text-sm"
             >
-              {#each config.models as model}
-                <option value={model.id}>{model.label}</option>
-              {/each}
+              {#if config.convertModels.length === 0}
+                <option value="">{i18n.t('models.noneConfigured')}</option>
+              {:else}
+                {#each config.convertModels as model}
+                  <option value={model.id}>{model.label}</option>
+                {/each}
+              {/if}
             </select>
           </div>
 

@@ -12,8 +12,10 @@
 
   const fallbackConfig: AppConfigResponse = {
     appName: 'Distilla',
-    models: [{ id: 'gpt-4o', label: 'GPT-4o' }],
-    defaultModel: 'gpt-4o',
+    convertModels: [],
+    defaultConvertModel: null,
+    summarizeModels: [],
+    defaultSummarizeModel: null,
     maxUploadSizeMb: 1024,
     mediaMaxOutputSizeMb: 100,
     supportedExtensions: [

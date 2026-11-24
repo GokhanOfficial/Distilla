@@ -12,8 +12,10 @@ export interface FormatInfo {
 
 export interface AppConfigResponse {
   appName: string;
-  models: ModelOption[];
-  defaultModel: string;
+  convertModels: ModelOption[];
+  defaultConvertModel: string | null;
+  summarizeModels: ModelOption[];
+  defaultSummarizeModel: string | null;
   maxUploadSizeMb: number;
   mediaMaxOutputSizeMb: number;
   supportedExtensions: string[];

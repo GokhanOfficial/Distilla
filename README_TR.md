@@ -23,7 +23,7 @@ Minimum RAM tüketimi ve anında açılış için **tek derlenmiş Rust binary's
 - **Gerçek Zamanlı SSE Akışı ve Gerçek İptal:** FFmpeg ilerlemesi ve AI Markdown çıktısı Server-Sent Events ile anlık akar. İptal edildiğinde hem alt süreçler (FFmpeg/LibreOffice) hem de OpenAI HTTP akışı anında durdurulur.
 - **AI Özetleyici:** Metinleri veya dönüştürülen belgeleri canlı önizlemeyle özetler, otomatik açıklayıcı dosya adı üretir.
 - **MD → PDF Stüdyosu:** Çift yönlü senkronize kaydırmalı editör, DOMPurify XSS korumalı önizleme, kod bloklarını asla bozmayan AST tabanlı KaTeX matematik desteği, dış CDN'siz yerel assetler, gerçek çok sayfalı A4 kenar boşlukları ve UTF-16 PDF metadata.
-- **Dinamik Yapılandırma:** `.env` üzerinden yapılandırılabilir AI model listesi (`AI_MODELS`), eksiksiz **TR / EN** dil desteği ve **Karanlık / Aydınlık** tema.
+- **Dinamik Yapılandırma:** Kod içine gömülü model olmadan `.env` üzerinden ayrı Dönüştürücü (`CONVERT_MODELS`) ve Özetleyici (`SUMMARIZE_MODELS`) model listeleri, eksiksiz **TR / EN** dil desteği ve **Karanlık / Aydınlık** tema.
 
 ## Hızlı Başlangıç
 

@@ -26,10 +26,18 @@ pub async fn start_job(
         );
     }
 
-    let model = payload
+    let Some(model) = payload
         .model
-        .filter(|m| !m.trim().is_empty())
-        .unwrap_or_else(|| state.config.openai.default_model.clone());
+        .map(|m| m.trim().to_string())
+        .filter(|m| !m.is_empty())
+        .or_else(|| state.config.openai.default_summarize_model.clone())
+    else {
+        return json_error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "No summarizer AI model configured (set SUMMARIZE_MODELS in .env)",
+            "errors.noModelConfigured",
+        );
+    };
 
     let (job_id, cancel_token) = state.jobs.create_job(JobKind::Summarize, None).await;
     tracing::info!(job_id = %job_id, model = %model, "Started summarization job");

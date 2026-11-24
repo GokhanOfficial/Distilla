@@ -30,8 +30,8 @@
   let unsubscribeSse: (() => void) | null = null;
 
   $effect(() => {
-    if (!selectedModel && config.defaultModel) {
-      selectedModel = config.defaultModel;
+    if (!selectedModel && config.defaultSummarizeModel) {
+      selectedModel = config.defaultSummarizeModel;
     }
   });
 
@@ -59,6 +59,12 @@
       return;
     }
 
+    const modelToUse = selectedModel || config.defaultSummarizeModel;
+    if (!modelToUse) {
+      toasts.show(i18n.t('toast.noModelConfigured'), 'error');
+      return;
+    }
+
     if (unsubscribeSse) {
       unsubscribeSse();
       unsubscribeSse = null;
@@ -70,7 +76,7 @@
     aiStats = null;
 
     try {
-      const { jobId } = await startSummarizeJob(inputMarkdown, selectedModel || config.defaultModel);
+      const { jobId } = await startSummarizeJob(inputMarkdown, modelToUse);
       activeJobId = jobId;
 
       unsubscribeSse = subscribeToJob('summarize', jobId, {
@@ -163,12 +169,16 @@
     <div class="flex flex-wrap items-center gap-2">
       <select
         bind:value={selectedModel}
-        disabled={busy}
+        disabled={busy || config.summarizeModels.length === 0}
         class="surface-input rounded-lg px-3 py-2 text-xs"
       >
-        {#each config.models as model}
-          <option value={model.id}>{model.label}</option>
-        {/each}
+        {#if config.summarizeModels.length === 0}
+          <option value="">{i18n.t('models.noneConfigured')}</option>
+        {:else}
+          {#each config.summarizeModels as model}
+            <option value={model.id}>{model.label}</option>
+          {/each}
+        {/if}
       </select>
 
       {#if busy}

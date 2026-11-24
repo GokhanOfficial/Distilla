@@ -201,7 +201,9 @@ impl OpenAiService {
             .filename_model
             .as_deref()
             .or(model_override)
-            .unwrap_or(&self.config.default_model);
+            .or(self.config.default_summarize_model.as_deref())
+            .or(self.config.default_convert_model.as_deref())
+            .ok_or_else(|| anyhow!("No AI model configured for filename generation"))?;
 
         let sample = sample_markdown(markdown, 4000);
         let prompt = format!("{}\n{}\n\nDosya adı:", FILENAME_PROMPT, sample);

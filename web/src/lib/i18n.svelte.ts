@@ -84,6 +84,8 @@ const translations = {
     'toast.emptyContent': 'İçerik boş',
     'toast.serverUnreachable': 'Sunucu bağlantısı kurulamadı',
     'toast.aiNotConfigured': 'Sunucuda OPENAI_API_KEY yapılandırılmamış',
+    'toast.noModelConfigured': 'Bu işlem için .env dosyasında AI modeli yapılandırılmamış',
+    'models.noneConfigured': 'Model tanımlanmamış (.env)',
 
     'theme.dark': 'Karanlık Tema',
     'theme.light': 'Aydınlık Tema',
@@ -171,6 +173,8 @@ const translations = {
     'toast.emptyContent': 'Content is empty',
     'toast.serverUnreachable': 'Could not connect to server',
     'toast.aiNotConfigured': 'OPENAI_API_KEY is not configured on the server',
+    'toast.noModelConfigured': 'No AI model is configured in .env for this action',
+    'models.noneConfigured': 'No models configured (.env)',
 
     'theme.dark': 'Dark Theme',
     'theme.light': 'Light Theme',

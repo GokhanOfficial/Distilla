@@ -23,7 +23,7 @@ Built as a **single compiled Rust binary** (Axum + Tokio) embedding a **Virtual-
 - **Real-Time SSE Streaming & True Cancellation:** Live Server-Sent Events stream FFmpeg progress and AI Markdown deltas to the UI; cancelling aborts both child processes and the upstream OpenAI HTTP stream immediately.
 - **AI Summarizer:** Turn notes or converted Markdown into structured summaries with live preview, cancellation, and auto-generated filenames.
 - **MD → PDF Studio:** Split Markdown editor with synchronized scrolling, XSS-safe DOMPurify preview, AST-level KaTeX math (never corrupts code blocks), offline local KaTeX & Highlight.js assets, proper multi-page A4 margins, concurrency limiting, and UTF-16 PDF metadata.
-- **Dynamic Configuration:** Configure AI models via `.env` (`AI_MODELS`), full **TR / EN** localization, and **Dark / Light** theme support.
+- **Dynamic Configuration:** Separate `.env`-driven model lists for Converter (`CONVERT_MODELS`) and Summarizer (`SUMMARIZE_MODELS`) with zero hardcoded models, full **TR / EN** localization, and **Dark / Light** theme support.
 
 ## Quick Start
 
@@ -60,7 +60,7 @@ The final Docker image contains **only** the compiled Rust binary plus Chromium,
 
 ## Environment Variables
 
-See [`.env.example`](.env.example) for all options, including `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `AI_MODELS`, `AI_DEFAULT_MODEL`, `AI_FILENAME_MODEL`, `PDF_INPUT_MODE`, `MAX_UPLOAD_SIZE_MB`, `MEDIA_*`, `LIBREOFFICE_PATH`, `CHROMIUM_PATH`, and `PDF_MAX_CONCURRENCY`.
+See [`.env.example`](.env.example) for all options, including `OPENAI_API_KEY`, `OPENAI_BASE_URL`, `CONVERT_MODELS`, `CONVERT_DEFAULT_MODEL`, `SUMMARIZE_MODELS`, `SUMMARIZE_DEFAULT_MODEL`, `FILENAME_MODEL`, `PDF_INPUT_MODE`, `MAX_UPLOAD_SIZE_MB`, `MEDIA_*`, `LIBREOFFICE_PATH`, `CHROMIUM_PATH`, and `PDF_MAX_CONCURRENCY`.
 
 ## License
 
