@@ -1,0 +1,128 @@
+name: publish
+
+# Build the amd64 + arm64 image and push it to Docker Hub on every change that affects it, or manually.
+on:
+  push:
+    branches: [main]
+    paths:
+      - src/**
+      - web/**
+      - Cargo.toml
+      - Cargo.lock
+      - Dockerfile
+      - .dockerignore
+      - .github/workflows/publish.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+# A newer push supersedes a build still in progress, so `latest` never goes backwards.
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE: gokhanofficial/distilla
+
+jobs:
+  # Each architecture is built on a native runner (compiling Rust under QEMU is very slow)
+  # and pushed by digest; the merge job then tags both as one multi-arch image.
+  build:
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
+    outputs:
+      push: ${{ steps.creds.outputs.ok }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+
+      - uses: docker/setup-buildx-action@v4
+
+      # Without the secrets (e.g. a fork) the image is built but not pushed.
+      - id: creds
+        env:
+          HAS_CREDS: ${{ secrets.DOCKERHUB_USERNAME != '' && secrets.DOCKERHUB_TOKEN != '' }}
+        run: |
+          echo "ok=$HAS_CREDS" >> "$GITHUB_OUTPUT"
+          [ "$HAS_CREDS" = true ] || echo "::warning::Docker Hub secrets are missing; the image will not be pushed."
+
+      - if: steps.creds.outputs.ok == 'true'
+        uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: build
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          platforms: linux/${{ matrix.arch }}
+          pull: true
+          labels: ${{ steps.meta.outputs.labels }}
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=${{ steps.creds.outputs.ok }}
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=${{ matrix.arch }}
+
+      - if: steps.creds.outputs.ok == 'true'
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - if: steps.creds.outputs.ok == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: digest-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  merge:
+    needs: build
+    if: needs.build.outputs.push == 'true'
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - uses: docker/setup-buildx-action@v4
+
+      - uses: docker/login-action@v4
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      - name: Create multi-arch manifest
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          mapfile -t tags < <(jq -r '.tags[] | "--tag=" + .' <<< "$DOCKER_METADATA_OUTPUT_JSON")
+          digests=(*)
+          docker buildx imagetools create "${tags[@]}" "${digests[@]/#/$IMAGE@sha256:}"
+
+      - name: Inspect
+        env:
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: docker buildx imagetools inspect "$IMAGE:$VERSION"

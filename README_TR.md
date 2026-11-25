@@ -44,9 +44,25 @@ Tarayıcıda `http://localhost:3000` adresini açın.
 
 ### Docker Compose
 
+Hazır imaj (linux/amd64, linux/arm64) Docker Hub'da yayınlanır: [`gokhanofficial/distilla`](https://hub.docker.com/r/gokhanofficial/distilla)
+
 ```bash
-cp .env.example .env
-docker compose up --build -d
+curl -fsSLO https://raw.githubusercontent.com/GokhanOfficial/Distilla/main/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/GokhanOfficial/Distilla/main/.env.example -o .env
+# .env dosyasına OPENAI_API_KEY ve modellerinizi girin
+docker compose up -d
+```
+
+Güncellemek için:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+İmajı yerel klondan derlemek isterseniz:
+
+```bash
+docker build -t gokhanofficial/distilla:latest .
 ```
 
 Final Docker imajında Node.js runtime'ı yer almaz; yalnızca derlenmiş Rust binary'si ile Chromium, FFmpeg, LibreOffice ve Noto fontları bulunur.

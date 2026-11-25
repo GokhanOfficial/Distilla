@@ -51,9 +51,25 @@ Open `http://localhost:3000`.
 
 ### Docker Compose
 
+The prebuilt image (linux/amd64, linux/arm64) is published on Docker Hub: [`gokhanofficial/distilla`](https://hub.docker.com/r/gokhanofficial/distilla)
+
 ```bash
-cp .env.example .env
-docker compose up --build -d
+curl -fsSLO https://raw.githubusercontent.com/GokhanOfficial/Distilla/main/docker-compose.yml
+curl -fsSL https://raw.githubusercontent.com/GokhanOfficial/Distilla/main/.env.example -o .env
+# Edit .env with your OPENAI_API_KEY and preferred models
+docker compose up -d
+```
+
+To update:
+
+```bash
+docker compose pull && docker compose up -d
+```
+
+To build the image from a local clone instead:
+
+```bash
+docker build -t gokhanofficial/distilla:latest .
 ```
 
 The final Docker image contains **only** the compiled Rust binary plus Chromium, FFmpeg, LibreOffice, and Noto fonts — no Node.js runtime in production.

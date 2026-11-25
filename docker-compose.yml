@@ -1,9 +1,6 @@
 services:
   distilla:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    image: distilla:latest
+    image: gokhanofficial/distilla:latest
     container_name: distilla
     restart: unless-stopped
     env_file:
